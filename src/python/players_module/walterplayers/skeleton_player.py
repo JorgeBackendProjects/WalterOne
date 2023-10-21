@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from walterplayers.base_player import BasePlayer
 from walterplayers.constants import Action
-
+from random import choice
 
 class MyPlayer(BasePlayer):
     """ Clase que hereda de la clase padre BasePlayer. """
@@ -22,11 +22,13 @@ class MyPlayer(BasePlayer):
 
         return Action.STOP, None
 
+
     def comprobar(self):
-        if self.find_response.status.life >= 170:
-            self.compLife170()
+        if self.find_response.status.life > 125:
+            self.compLife125()
         
-    def compLife170(self, find_response):
+
+    def compLife125(self, find_response):
         ''' Se asigna el jugador con menor vida de la zona actual. '''
         current_weakest_enemy = self.get_weakest_enemy(find_response.current_zone)
 
@@ -37,22 +39,32 @@ class MyPlayer(BasePlayer):
         
         for zone in find_response.neighbours_zones:
             weakest_enemy = self.get_weakest_enemy(zone)
-            if (weakest_neighbours_enemy == None or
-                weakest_enemy.life < weakest_neighbours_enemy.life):
-                weakest_neighbours_enemy = weakest_enemy
-                weakest_neighbours_zone = zone
+            
+            if weakest_enemy != None:
+
+                if (weakest_neighbours_enemy == None or weakest_enemy.life < weakest_neighbours_enemy.life):
+
+                    weakest_neighbours_enemy = weakest_enemy
+                    weakest_neighbours_zone = zone
         
-        if current_weakest_enemy.life < weakest_neighbours_enemy.life:
+        if current_weakest_enemy.life == None and weakest_neighbours_enemy.life == None:
+            return Action.MOVE, choice(self.get_id_neighbours_zones(find_response))
+
+        elif current_weakest_enemy.life < weakest_neighbours_enemy.life:
             return Action.ATTACK, current_weakest_enemy.id
         
         elif current_weakest_enemy.life > weakest_neighbours_enemy.life:
             return Action.MOVE, weakest_neighbours_zone.zone_id
 
-        elif current_weakest_enemy == None:
-            print()
-        elif weakest_neighbours_enemy == None:
-            print()
-        elif weakest_neighbours_enemy == None 
+        elif weakest_neighbours_enemy == None and current_weakest_enemy > 0:
+            return Action.ATTACK, current_weakest_enemy.id
+
+        elif current_weakest_enemy == None and weakest_neighbours_enemy > 0:
+            return Action.MOVE, weakest_neighbours_zone.zone_id
+        
+        else:
+            return Action.MOVE, choice(self.get_id_neighbours_zones(find_response))
+        
 
     def get_weakest_enemy(self, zone):
         ''' The weakest enemy in zone. '''
@@ -66,8 +78,10 @@ class MyPlayer(BasePlayer):
 
         return weakest_enemy
     
+
     def _get_enemies_in_zone(self, zone):
         return list(filter(lambda ia: Role.PLAYER == ia.role, zone.ias))
+
 
 def get_args():
     """ Get arguments from command line """
