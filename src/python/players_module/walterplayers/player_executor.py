@@ -17,7 +17,7 @@ from walterplayers.johnny_walker_player import JohnnyWalkerPlayer
 from walterplayers.road_runner_player import RoadRunnerPlayer
 from walterplayers.bipolar.bipolar_player import BipolarPlayer
 
-host = "localhost:8000"
+host = "192.168.1.83:8000"
 password = "passwordmuysegura"
 match = "2"
 
