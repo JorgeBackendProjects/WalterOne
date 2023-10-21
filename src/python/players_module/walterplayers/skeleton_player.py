@@ -16,17 +16,16 @@ class MyPlayer(BasePlayer):
 
     """ Método padre de la clase que se ejecuta en cada turno, se encarga de llamar a todas las 
     funciones de la clase para realizar comprobaciones y acciones en un determinado turno. """
-    def choose_action(self, find_response):
+    def choose_action(self):
 
-        self.comprobar()
-
-        return Action.STOP, None
+        self.comprobar(self)
 
 
     def comprobar(self):
         if self.find_response.status.life > 125:
-            self.compLife125()
-        
+            return self.compLife125()
+        elif self.find_response.status.life <= 125:
+            print()
 
     def compLife125(self, find_response):
         ''' Se asigna el jugador con menor vida de la zona actual. '''
