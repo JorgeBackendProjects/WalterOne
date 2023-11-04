@@ -16,18 +16,19 @@ class MyPlayer(BasePlayer):
 
     """ Método padre de la clase que se ejecuta en cada turno, se encarga de llamar a todas las 
     funciones de la clase para realizar comprobaciones y acciones en un determinado turno. """
-    def choose_action(self):
+    def choose_action(self, find_response):
 
-        self.comprobar(self)
+        return self.comprobar(find_response)
 
 
-    def comprobar(self):
-        if self.find_response.status.life > 125:
-            return self.compLife125()
-        elif self.find_response.status.life <= 125:
-            print()
+    def comprobar(self, find_response):
+        if self.life >= 140:
+            return self.hardStrategy(find_response)
+        if self.life < 140:
+            return self.defensiveStrategy(find_response)
 
-    def compLife125(self, find_response):
+
+    def hardStrategy(self, find_response):
         ''' Se asigna el jugador con menor vida de la zona actual. '''
         current_weakest_enemy = self.get_weakest_enemy(find_response.current_zone)
 
@@ -42,11 +43,10 @@ class MyPlayer(BasePlayer):
             if weakest_enemy != None:
 
                 if (weakest_neighbours_enemy == None or weakest_enemy.life < weakest_neighbours_enemy.life):
-
                     weakest_neighbours_enemy = weakest_enemy
                     weakest_neighbours_zone = zone
-        
-        if current_weakest_enemy.life == None and weakest_neighbours_enemy.life == None:
+
+        if current_weakest_enemy == None and weakest_neighbours_enemy == None:
             return Action.MOVE, choice(self.get_id_neighbours_zones(find_response))
 
         elif current_weakest_enemy.life < weakest_neighbours_enemy.life:
@@ -61,10 +61,26 @@ class MyPlayer(BasePlayer):
         elif current_weakest_enemy == None and weakest_neighbours_enemy > 0:
             return Action.MOVE, weakest_neighbours_zone.zone_id
         
+        elif current_weakest_enemy.life == weakest_neighbours_enemy.life:
+            if len(find_response.current_zone.ias) < len(weakest_neighbours_zone.ias):
+                return Action.ATTACK, current_weakest_enemy.id
+            else:
+                return Action.MOVE, weakest_neighbours_zone.zone_id
+            
         else:
             return Action.MOVE, choice(self.get_id_neighbours_zones(find_response))
-        
-
+    
+    """def defensiveStrategy(self, find_response):
+        for zone in find_response.neighbours_zones:
+            if len(zone.ias) < 1000nPlayers:
+                1000nPlayers = len(zone.ias)
+                1000zone.id = zone.zone_id
+ 
+            elif len(zone.ias) == True:
+                if zone.triggers.karin_gift == True:
+                    1000nPlayers = len(zone.ias)
+                    1000zone.id""" 
+    
     def get_weakest_enemy(self, zone):
         ''' The weakest enemy in zone. '''
         min_life = sys.maxsize
